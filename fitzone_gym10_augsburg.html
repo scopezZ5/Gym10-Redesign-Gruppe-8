@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym10 Augsburg</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #f5f0e8;
+    --accent: #e8ff00;
+    --red: #ff3333;
+    --gray: #1a1a1a;
+    --mid: #2a2a2a;
+    --text-muted: #888;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; overflow-x: hidden; cursor: none; }
+
+  .cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: transform 0.1s; mix-blend-mode: difference; }
+  .cursor-ring { width: 36px; height: 36px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: left 0.12s ease, top 0.12s ease; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 24px 48px; background: rgba(8,8,8,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); transition: padding 0.3s; }
+  nav.scrolled { padding: 16px 48px; }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: var(--accent); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { color: var(--white); text-decoration: none; font-size: 13px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; position: relative; opacity: 0.7; transition: opacity 0.2s; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+  .nav-links a:hover { opacity: 1; }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta { background: var(--accent); color: var(--black) !important; padding: 10px 24px !important; opacity: 1 !important; font-weight: 700 !important; transition: background 0.2s, transform 0.2s !important; }
+  .nav-cta:hover { background: var(--white) !important; transform: scale(1.05); }
+  .nav-cta::after { display: none !important; }
+
+  #hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; position: relative; overflow: hidden; }
+  .hero-left { display: flex; flex-direction: column; justify-content: center; padding: 140px 60px 80px; position: relative; z-index: 2; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 32px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-tag::before { content: ''; width: 30px; height: 1px; background: var(--accent); }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(72px, 9vw, 130px); line-height: 0.9; letter-spacing: -2px; margin-bottom: 32px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .hero-title span { color: var(--accent); display: block; }
+  .hero-sub { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 420px; margin-bottom: 48px; opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 0.8s forwards; }
+  .btn-primary { background: var(--accent); color: var(--black); padding: 16px 36px; font-weight: 700; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer; transition: transform 0.2s, background 0.2s; text-decoration: none; display: inline-block; }
+  .btn-primary:hover { background: var(--white); transform: translateY(-2px); }
+  .btn-secondary { background: transparent; color: var(--white); padding: 16px 36px; font-weight: 500; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.25); cursor: pointer; transition: border-color 0.2s, transform 0.2s; text-decoration: none; display: inline-block; }
+  .btn-secondary:hover { border-color: var(--white); transform: translateY(-2px); }
+  .hero-stats { display: flex; gap: 48px; margin-top: 64px; padding-top: 48px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; animation: fadeUp 0.8s 1s forwards; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 44px; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--text-muted); letter-spacing: 1px; margin-top: 4px; }
+  .hero-right { position: relative; overflow: hidden; }
+  .hero-right img { width: 100%; height: 100%; object-fit: cover; object-position: center top; opacity: 0.6; animation: scaleIn 1.2s 0.3s both; }
+  .hero-right::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, var(--black) 0%, transparent 40%); z-index: 1; }
+  .hero-overlay-text { position: absolute; bottom: 48px; right: 40px; font-family: 'Bebas Neue', sans-serif; font-size: 200px; color: rgba(232,255,0,0.04); letter-spacing: -10px; line-height: 1; z-index: 0; user-select: none; }
+
+  .marquee-wrap { background: var(--accent); padding: 14px 0; overflow: hidden; white-space: nowrap; }
+  .marquee-inner { display: inline-block; animation: marquee 20s linear infinite; }
+  .marquee-inner span { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; color: var(--black); margin: 0 32px; }
+
+  section { padding: 100px 60px; }
+  .section-label { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 6vw, 80px); line-height: 1; letter-spacing: -1px; margin-bottom: 64px; }
+
+  /* VORTEILE */
+  #studio { background: var(--gray); }
+  .vorteile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--mid); margin-bottom: 60px; }
+  .vorteil-card { background: var(--gray); padding: 36px 32px; transition: background 0.3s; }
+  .vorteil-card:hover { background: var(--mid); }
+  .vorteil-icon { font-size: 32px; margin-bottom: 16px; }
+  .vorteil-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--accent); margin-bottom: 8px; }
+  .vorteil-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* PLANS */
+  #abos { background: var(--black); }
+  .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; border: 2px solid var(--mid); }
+  .plan { background: var(--gray); padding: 48px 40px; position: relative; transition: background 0.3s; overflow: hidden; }
+  .plan:hover { background: var(--mid); }
+  .plan.featured { background: var(--accent); color: var(--black); }
+  .plan.featured .plan-price, .plan.featured .plan-name, .plan.featured .plan-feature { color: var(--black); }
+  .plan.featured .plan-feature-icon { color: var(--black); }
+  .plan-badge { position: absolute; top: 24px; right: 24px; background: var(--black); color: var(--accent); font-size: 10px; letter-spacing: 2px; padding: 4px 12px; font-weight: 700; }
+  .plan-name { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; margin-bottom: 24px; }
+  .plan-price { font-family: 'Bebas Neue', sans-serif; font-size: 72px; line-height: 1; letter-spacing: -2px; margin-bottom: 8px; }
+  .plan-period { font-size: 14px; color: var(--text-muted); margin-bottom: 40px; }
+  .plan.featured .plan-period { color: rgba(0,0,0,0.6); }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .plan-feature { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--white); }
+  .plan-feature-icon { color: var(--accent); font-size: 18px; }
+  .plan-btn { margin-top: 48px; display: block; text-align: center; padding: 14px; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; background: var(--black); color: var(--white); border: none; cursor: pointer; transition: background 0.2s, color 0.2s; text-decoration: none; }
+  .plan-btn:hover { background: var(--white); color: var(--black); }
+  .plan.featured .plan-btn { background: var(--black); color: var(--accent); }
+  .plan.featured .plan-btn:hover { background: var(--white); color: var(--black); }
+
+  /* EXERCISES */
+  #uebungen { background: var(--gray); }
+  .exercises-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .exercise-card { position: relative; overflow: hidden; height: 380px; cursor: pointer; }
+  .exercise-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; filter: brightness(0.5); }
+  .exercise-card:hover img { transform: scale(1.08); filter: brightness(0.3); }
+  .exercise-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 32px; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); }
+  .exercise-tag { display: inline-block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; background: var(--accent); color: var(--black); padding: 4px 10px; margin-bottom: 10px; font-weight: 700; }
+  .exercise-name { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px; }
+  .exercise-detail { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; opacity: 0; transition: opacity 0.3s 0.1s; }
+  .exercise-card:hover .exercise-detail { opacity: 1; }
+
+  /* SCHEDULE */
+  #plan { background: var(--black); }
+  .schedule-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--mid); }
+  .schedule-day { background: var(--gray); padding: 40px 36px; position: relative; overflow: hidden; }
+  .schedule-day::before { content: attr(data-day-num); position: absolute; top: -10px; right: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 100px; color: rgba(232,255,0,0.05); line-height: 1; }
+  .day-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--accent); margin-bottom: 20px; }
+  .day-workout { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .day-goal { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+  .day-goal::before { content: '→'; color: var(--accent); }
+
+  /* SO FUNKTIONIERT ES */
+  #howto { background: var(--gray); }
+  .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--mid); }
+  .step-card { background: var(--gray); padding: 40px 32px; position: relative; transition: background 0.3s; }
+  .step-card:hover { background: var(--mid); }
+  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: rgba(232,255,0,0.12); line-height: 1; margin-bottom: 16px; }
+  .step-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent); letter-spacing: 1px; margin-bottom: 10px; }
+  .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  /* SIGNUP */
+  #anmeldung { background: var(--black); }
+  .signup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .signup-left h3 { font-family: 'Bebas Neue', sans-serif; font-size: 56px; line-height: 1; letter-spacing: -1px; margin-bottom: 24px; }
+  .signup-left p { color: var(--text-muted); font-size: 16px; line-height: 1.8; margin-bottom: 40px; }
+  .signup-perks { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .signup-perk { display: flex; align-items: center; gap: 16px; font-size: 15px; }
+  .perk-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+
+  .form-group { margin-bottom: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 8px; }
+  input[type="text"], input[type="email"], select, textarea { width: 100%; background: var(--gray); border: 1px solid rgba(255,255,255,0.1); color: var(--white); padding: 14px 18px; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select { appearance: none; cursor: pointer; }
+  select option { background: var(--black); }
+  textarea { resize: vertical; min-height: 120px; }
+  .form-submit { width: 100%; padding: 18px; background: var(--accent); color: var(--black); border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.2s; }
+  .form-submit:hover { background: var(--white); transform: translateY(-2px); }
+
+  /* KONTAKT */
+  #kontakt { background: var(--gray); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; }
+  .contact-info { display: flex; flex-direction: column; gap: 36px; }
+  .contact-item-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .contact-item-val { font-size: 17px; color: var(--white); line-height: 1.6; }
+
+  footer { background: var(--gray); padding: 40px 60px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--mid); }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--accent); }
+  .footer-copy { font-size: 13px; color: var(--text-muted); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(1.05); } to { opacity: 0.6; transform: scale(1); } }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s, transform 0.7s; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--white); transition: 0.3s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--black); padding: 24px; gap: 16px; }
+    .nav-links.open { display: flex; }
+    .hamburger { display: flex; }
+    #hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 120px 24px 60px; }
+    section { padding: 60px 24px; }
+    .plans-grid, .exercises-grid, .schedule-grid, .vorteile-grid, .steps-grid { grid-template-columns: 1fr; }
+    .signup-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav id="navbar">
+  <div class="nav-logo">GYM10</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#studio">Vorteile</a></li>
+    <li><a href="#abos">Tarife</a></li>
+    <li><a href="#uebungen">Training</a></li>
+    <li><a href="#howto">So geht's</a></li>
+    <li><a href="#anmeldung" class="nav-cta">Jetzt starten</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Augsburg Innenstadt · Kesselmarkt 2</div>
+    <h1 class="hero-title">
+      EINFACH<br>
+      FITNESS.<br>
+      <span>AB 14,90€.</span>
+    </h1>
+    <p class="hero-sub">Das günstigste Fitnessstudio Deutschlands. 24/7 geöffnet, keine versteckten Kosten, kostenlose Trainereinweisung – einfach anfangen.</p>
+    <div class="hero-btns">
+      <a href="#anmeldung" class="btn-primary">Mitglied werden</a>
+      <a href="#anmeldung" class="btn-secondary">Kostenloses Probetraining</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Geöffnet</div>
+      </div>
+      <div>
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Studios deutschlandweit</div>
+      </div>
+      <div>
+        <div class="stat-num">0€</div>
+        <div class="stat-label">Einrichtungsgebühr</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-overlay-text">G10</div>
+    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900&q=80" alt="Gym10 Augsburg">
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <span>KRAFTTRAINING</span><span>★</span>
+    <span>24/7 GEÖFFNET</span><span>★</span>
+    <span>KEIN VERTRAG</span><span>★</span>
+    <span>KOSTENLOSE EINWEISUNG</span><span>★</span>
+    <span>GRATIS WLAN</span><span>★</span>
+    <span>AB 14,90 € / MONAT</span><span>★</span>
+    <span>KRAFTTRAINING</span><span>★</span>
+    <span>24/7 GEÖFFNET</span><span>★</span>
+    <span>KEIN VERTRAG</span><span>★</span>
+    <span>KOSTENLOSE EINWEISUNG</span><span>★</span>
+    <span>GRATIS WLAN</span><span>★</span>
+    <span>AB 14,90 € / MONAT</span><span>★</span>
+  </div>
+</div>
+
+<!-- VORTEILE -->
+<section id="studio">
+  <div class="section-label">Deine Vorteile</div>
+  <h2 class="section-title reveal">WARUM<br>GYM10?</h2>
+  <div class="vorteile-grid reveal">
+    <div class="vorteil-card">
+      <div class="vorteil-icon">💰</div>
+      <div class="vorteil-title">Bester Preis der Stadt</div>
+      <div class="vorteil-desc">Ohne versteckte Kosten. Ab 14,90 € im Monat – günstiger geht's nicht.</div>
+    </div>
+    <div class="vorteil-card">
+      <div class="vorteil-icon">🕐</div>
+      <div class="vorteil-title">24/7 Öffnungszeiten</div>
+      <div class="vorteil-desc">Trainiere wann du willst – rund um die Uhr, 365 Tage im Jahr.</div>
+    </div>
+    <div class="vorteil-card">
+      <div class="vorteil-icon">🏋️</div>
+      <div class="vorteil-title">Kostenlose Trainereinweisung</div>
+      <div class="vorteil-desc">Kein gelangweiltes Thekenpersonal – echte Einweisung durch erfahrene Trainer.</div>
+    </div>
+    <div class="vorteil-card">
+      <div class="vorteil-icon">📋</div>
+      <div class="vorteil-title">Faire & flexible Tarife</div>
+      <div class="vorteil-desc">Jederzeit kündbar. Keine nervigen Verkaufsgespräche. Keine Bindung.</div>
+    </div>
+    <div class="vorteil-card">
+      <div class="vorteil-icon">⚙️</div>
+      <div class="vorteil-title">Top Cardio & Kraftgeräte</div>
+      <div class="vorteil-desc">Alles was du wirklich brauchst – pur, effektiv und ohne unnötigen Schnickschnack.</div>
+    </div>
+    <div class="vorteil-card">
+      <div class="vorteil-icon">📶</div>
+      <div class="vorteil-title">WLAN gratis</div>
+      <div class="vorteil-desc">Schnelles Internet im ganzen Studio – kostenlos für alle Mitglieder.</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;" class="reveal">
+    <div>
+      <p style="color:var(--text-muted);font-size:17px;line-height:1.9;">Für uns ist Minimalismus echte Größe. Gym10 hat deshalb nur, was du für dein Fitnesstraining wirklich benötigst, um schneller ans Ziel zu kommen – pur und unverfälscht. Und immer zu einem unschlagbar günstigen Preis!</p>
+      <div style="display:flex;gap:32px;margin-top:48px;">
+        <div>
+          <div style="font-family:'Bebas Neue';font-size:36px;color:var(--accent);">24/7</div>
+          <div style="font-size:13px;color:var(--text-muted);">Täglich geöffnet</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue';font-size:36px;color:var(--accent);">30+</div>
+          <div style="font-size:13px;color:var(--text-muted);">Studios in Deutschland</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue';font-size:36px;color:var(--accent);">14,90€</div>
+          <div style="font-size:13px;color:var(--text-muted);">Ab / Monat</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:relative;height:420px;">
+      <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=700&q=80" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7);" alt="Gym10 Studio">
+      <div style="position:absolute;bottom:32px;left:32px;background:var(--accent);padding:20px 28px;">
+        <div style="font-family:'Bebas Neue';font-size:28px;color:var(--black);letter-spacing:1px;">Augsburg Innenstadt</div>
+        <div style="font-size:13px;color:rgba(0,0,0,0.7);">Kesselmarkt 2, 86152 Augsburg</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TARIFE -->
+<section id="abos">
+  <div class="section-label">Mitgliedschaften</div>
+  <h2 class="section-title reveal">WÄHLE DEINEN<br>TARIF.</h2>
+  <div class="plans-grid reveal">
+    <div class="plan">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">14<sup style="font-size:36px;">,90</sup></div>
+      <div class="plan-period">€ / Monat · monatlich kündbar</div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Gerätetraining 24/7</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Cardio & Kraftgeräte</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Gratis WLAN</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Kostenlose Einweisung</li>
+        <li class="plan-feature" style="opacity:0.3;"><span class="plan-feature-icon">✗</span> Trainingsplan</li>
+      </ul>
+      <a href="#anmeldung" class="plan-btn">Jetzt wählen</a>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">BELIEBT</div>
+      <div class="plan-name">Flex</div>
+      <div class="plan-price">19<sup style="font-size:36px;">,90</sup></div>
+      <div class="plan-period">€ / Monat · Superflex, jederzeit kündbar</div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Alles aus Basic</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Kündigung zum Monatsende</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Keine Mindestlaufzeit</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Gratis Trainerberatung</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Zugang zu allen 30+ Studios</li>
+      </ul>
+      <a href="#anmeldung" class="plan-btn">Jetzt wählen</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Probetraining</div>
+      <div class="plan-price" style="font-size:56px;">Kostenlos</div>
+      <div class="plan-period">Einmalig & unverbindlich</div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> 1 Tag testen</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Keine Anmeldepflicht</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Zugangscode per SMS</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Kostenlose Einweisung</li>
+        <li class="plan-feature"><span class="plan-feature-icon">✓</span> Kein Risiko</li>
+      </ul>
+      <a href="#anmeldung" class="plan-btn">Termin buchen</a>
+    </div>
+  </div>
+</section>
+
+<!-- ÜBUNGEN -->
+<section id="uebungen">
+  <div class="section-label">Geräte & Training</div>
+  <h2 class="section-title reveal">DEIN<br>TRAINING.</h2>
+  <div class="exercises-grid reveal">
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=600&q=80" alt="Kniebeugen">
+      <div class="exercise-info">
+        <div class="exercise-tag">Beine & Po</div>
+        <div class="exercise-name">Kniebeugen</div>
+        <div class="exercise-detail">Schwierigkeit: Mittel • 3–5 Sätze • 8–12 Wdh</div>
+      </div>
+    </div>
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&q=80" alt="Bankdrücken">
+      <div class="exercise-info">
+        <div class="exercise-tag">Brust & Trizeps</div>
+        <div class="exercise-name">Bankdrücken</div>
+        <div class="exercise-detail">Schwierigkeit: Mittel • 4 Sätze • 6–10 Wdh</div>
+      </div>
+    </div>
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=600&q=80" alt="Latzug">
+      <div class="exercise-info">
+        <div class="exercise-tag">Rücken & Bizeps</div>
+        <div class="exercise-name">Latzug</div>
+        <div class="exercise-detail">Schwierigkeit: Einfach • 3 Sätze • 10–15 Wdh</div>
+      </div>
+    </div>
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?w=600&q=80" alt="Kreuzheben">
+      <div class="exercise-info">
+        <div class="exercise-tag">Rücken & Gesäß</div>
+        <div class="exercise-name">Kreuzheben</div>
+        <div class="exercise-detail">Schwierigkeit: Schwer • 4 Sätze • 5–8 Wdh</div>
+      </div>
+    </div>
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80" alt="Plank">
+      <div class="exercise-info">
+        <div class="exercise-tag">Core & Bauch</div>
+        <div class="exercise-name">Plank</div>
+        <div class="exercise-detail">Schwierigkeit: Einfach • 3 Sätze • 60 Sek. halten</div>
+      </div>
+    </div>
+    <div class="exercise-card">
+      <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80" alt="Cardio">
+      <div class="exercise-info">
+        <div class="exercise-tag">Ausdauer</div>
+        <div class="exercise-name">Cardio</div>
+        <div class="exercise-detail">Laufband, Crosstrainer, Fahrrad • alle Level</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAININGSPLAN -->
+<section id="plan">
+  <div class="section-label">Wochenplan</div>
+  <h2 class="section-title reveal">BEISPIEL-<br>TRAININGSPLAN.</h2>
+  <div class="schedule-grid reveal">
+    <div class="schedule-day" data-day-num="01">
+      <div class="day-name">Montag</div>
+      <div class="day-workout">Brust & Trizeps</div>
+      <div class="day-goal">Kraftaufbau</div>
+    </div>
+    <div class="schedule-day" data-day-num="02">
+      <div class="day-name">Dienstag</div>
+      <div class="day-workout">Cardio & Ausdauer</div>
+      <div class="day-goal">Fettverbrennung</div>
+    </div>
+    <div class="schedule-day" data-day-num="03">
+      <div class="day-name">Mittwoch</div>
+      <div class="day-workout">Rücken & Bizeps</div>
+      <div class="day-goal">Muskelaufbau</div>
+    </div>
+    <div class="schedule-day" data-day-num="04">
+      <div class="day-name">Donnerstag</div>
+      <div class="day-workout">Aktive Erholung</div>
+      <div class="day-goal">Regeneration</div>
+    </div>
+    <div class="schedule-day" data-day-num="05">
+      <div class="day-name">Freitag</div>
+      <div class="day-workout">Beine & Bauch</div>
+      <div class="day-goal">Stabilität</div>
+    </div>
+    <div class="schedule-day" data-day-num="06">
+      <div class="day-name">Samstag</div>
+      <div class="day-workout">Schultern & Core</div>
+      <div class="day-goal">Definition</div>
+    </div>
+  </div>
+</section>
+
+<!-- SO FUNKTIONIERT ES -->
+<section id="howto">
+  <div class="section-label">Ablauf</div>
+  <h2 class="section-title reveal">SO EINFACH<br>GEHT'S.</h2>
+  <div class="steps-grid reveal">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-title">Online buchen</div>
+      <div class="step-desc">Probetraining oder Mitgliedschaft bequem online abschließen – in wenigen Minuten.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-title">Einweisung wählen</div>
+      <div class="step-desc">Auf Wunsch kostenlose Basiseinweisung durch einen unserer Trainer buchen.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-title">Code per SMS</div>
+      <div class="step-desc">Deinen persönlichen Zugangscode zum Studio bekommst du bequem per SMS zugeschickt.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div class="step-title">Come in & train!</div>
+      <div class="step-desc">Einfach reinkommen, trainieren und großartig fühlen. Jederzeit, 24/7.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ANMELDUNG -->
+<section id="anmeldung">
+  <div class="section-label">Anmeldung</div>
+  <div class="signup-grid">
+    <div class="signup-left reveal">
+      <h3>JETZT<br>MITGLIED<br>WERDEN.</h3>
+      <p>Starte noch heute in Augsburg's günstigstem Fitnessstudio. Keine Einrichtungsgebühr, keine versteckten Kosten – einfach loslegen.</p>
+      <ul class="signup-perks">
+        <li class="signup-perk"><div class="perk-dot"></div>Kostenloses Probetraining</li>
+        <li class="signup-perk"><div class="perk-dot"></div>Jederzeit kündbar (Superflex)</li>
+        <li class="signup-perk"><div class="perk-dot"></div>Keine Einrichtungsgebühr</li>
+        <li class="signup-perk"><div class="perk-dot"></div>Zugangscode bequem per SMS</li>
+        <li class="signup-perk"><div class="perk-dot"></div>Kostenlose Trainereinweisung</li>
+      </ul>
+    </div>
+    <div class="reveal">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Vorname</label>
+          <input type="text" placeholder="Max">
+        </div>
+        <div class="form-group">
+          <label>Nachname</label>
+          <input type="text" placeholder="Mustermann">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-Mail</label>
+        <input type="email" placeholder="max@email.de">
+      </div>
+      <div class="form-group">
+        <label>Tarif wählen</label>
+        <select>
+          <option>Basic – ab 14,90 € / Monat</option>
+          <option>Superflex – ab 19,90 € / Monat</option>
+          <option>Kostenloses Probetraining</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Trainingsziel (optional)</label>
+        <textarea placeholder="z.B. Abnehmen, Muskelaufbau, Ausdauer verbessern..."></textarea>
+      </div>
+      <button class="form-submit" onclick="handleSignup()">Mitgliedschaft anfragen →</button>
+    </div>
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section id="kontakt">
+  <div class="section-label">Kontakt</div>
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <h2 class="section-title" style="margin-bottom:0;">SPRICH<br>MIT UNS.</h2>
+      <div>
+        <div class="contact-item-label">Adresse</div>
+        <div class="contact-item-val">Kesselmarkt 2<br>86152 Augsburg</div>
+      </div>
+      <div>
+        <div class="contact-item-label">Lage</div>
+        <div class="contact-item-val">Mitten in der Innenstadt,<br>gegenüber dem Eingang zur Fußgängerzone,<br>Augusta-Passage, Zugang über Kesselmarkt</div>
+      </div>
+      <div>
+        <div class="contact-item-label">Öffnungszeiten</div>
+        <div class="contact-item-val">Täglich 24/7 geöffnet</div>
+      </div>
+      <div>
+        <div class="contact-item-label">Website</div>
+        <div class="contact-item-val">gym10.de/de/fitnessstudio-augsburg</div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" placeholder="Dein Name">
+      </div>
+      <div class="form-group">
+        <label>E-Mail</label>
+        <input type="email" placeholder="deine@email.de">
+      </div>
+      <div class="form-group">
+        <label>Nachricht</label>
+        <textarea placeholder="Wie können wir dir helfen?" style="min-height:160px;"></textarea>
+      </div>
+      <button class="form-submit" onclick="handleContact()">Nachricht senden →</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">GYM10 Augsburg</div>
+  <div class="footer-copy">© 2026 Gym10 Augsburg · Kesselmarkt 2 · Schulprojekt</div>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX - 6 + 'px';
+    cursor.style.top = e.clientY - 6 + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  function toggleMenu() {
+    document.getElementById('navLinks').classList.toggle('open');
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  function handleSignup() { alert('✅ Vielen Dank! Wir melden uns in Kürze bei dir.'); }
+  function handleContact() { alert('✅ Nachricht gesendet! Wir antworten so schnell wie möglich.'); }
+</script>
+</body>
+</html>
